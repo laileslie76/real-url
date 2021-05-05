@@ -80,7 +80,6 @@ class HuYa:
 def get_real_url(rid):
     try:
         hy = HuYa(rid)
-        print(hy.get_yqk_content())
         return hy.get_real_url()
     except Exception as e:
         print('Exception：', e)
