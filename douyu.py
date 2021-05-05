@@ -5,7 +5,7 @@ import time
 
 import execjs
 import requests
-
+from bs4 import BeautifulSoup
 
 class DouYu:
 
@@ -112,9 +112,19 @@ class DouYu:
         else:
             key = self.get_js()
         return "http://tx2play1.douyucdn.cn/live/{}.flv?uuid=".format(key)
-
+    def get_yqk_content(self):
+        content='斗鱼,#genre#\n'
+        url ='https://www.douyu.com/g_yqk'
+        text = requests.get(url).text
+        soup = BeautifulSoup(text, 'html.parser')
+        for ultag  in soup.find_all('ul', {'class': 'layout-Cover-list'}):
+             for litag in ultag.find_all('li'):
+                if litag:
+                    content += ('{},http://192.168.123.2:8088/douyu{}\n'.format(litag.find('h3',{'class','DyListCover-intro'}).text,litag.find('a', href=True)['href']))
+        return content
 
 if __name__ == '__main__':
     r = input('输入斗鱼直播间号：\n')
     s = DouYu(r)
-    print(s.get_real_url())
+    # print(s.get_real_url())
+    print(s.get_yqk_ids())

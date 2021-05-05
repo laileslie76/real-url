@@ -7,6 +7,7 @@ import base64
 import urllib.parse
 import hashlib
 import time
+from bs4 import BeautifulSoup
 
 
 class HuYa:
@@ -64,16 +65,29 @@ class HuYa:
         url = "{}?wsSecret={}&wsTime={}&u={}&seqid={}&{}".format(i, m, ll, t, f, y)
         return url
 
+    def get_yqk_content(self):
+        content='虎牙,#genre#\n'
+        url ='https://www.huya.com/g/seeTogether'
+        text = requests.get(url).text
+        soup = BeautifulSoup(text, 'html.parser')
+        for ultag  in soup.find_all('ul', {'class': 'live-list clearfix'}):
+             for litag in ultag.find_all('li'):
+                if litag:
+                    content += ('{},http://192.168.123.2:8088/huya{}\n'.format(litag.find('a',{'class','title'}).text,litag.find('a',{'class','title'}, href=True)['href'].replace('https://www.huya.com','')))
+        return content
 
 def get_real_url(rid):
     try:
         hy = HuYa(rid)
+        print(hy.get_yqk_content())
         return hy.get_real_url()
     except Exception as e:
         print('Exception：', e)
         return False
+        
 
 
 if __name__ == '__main__':
     rid = input('输入虎牙直播房间号：\n')
     print(get_real_url(rid))
+
