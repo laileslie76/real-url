@@ -19,6 +19,10 @@ def get_url(plat,rid):
         url = y.get_real_url()
     return redirect(url, code=302)
 
+def get_nick(item):
+    if item:
+        return item.text + '-'
+    return ''
 def get_douyu_content(group,name):
     content=name+',#genre#\n'
     url ='https://www.douyu.com/' + group
@@ -27,7 +31,7 @@ def get_douyu_content(group,name):
     for ultag  in soup.find_all('ul', {'class': 'layout-Cover-list'}):
          for litag in ultag.find_all('li'):
             if litag:
-                content += ('{},http://192.168.123.2:8088/douyu{}\n'.format(litag.find('h3',{'class','DyListCover-intro'}).text,litag.find('a', href=True)['href']))
+                content += ('{},http://192.168.123.2:8088/douyu{}\n'.format(get_nick(litag.find('div',{'class','DyListCover-userName'}))  + litag.find('h3',{'class','DyListCover-intro'}).text,litag.find('a', href=True)['href']))
     return content
 
 def get_huya_content(group,name):
@@ -38,9 +42,9 @@ def get_huya_content(group,name):
     for ultag  in soup.find_all('ul', {'class': 'live-list clearfix'}):
          for litag in ultag.find_all('li'):
             if litag:
-                content += ('{},http://192.168.123.2:8088/huya{}\n'.format(litag.find('a',{'class','title'}).text,litag.find('a',{'class','title'}, href=True)['href'].replace('https://www.huya.com','')))
+                content += ('{},http://192.168.123.2:8088/huya{}\n'.format(get_nick(litag.find('i',{'class','nick'})) + litag.find('a',{'class','title'}).text,litag.find('a',{'class','title'}, href=True)['href'].replace('https://www.huya.com','')))
     return content
-
+    
 @app.route('/alltv')
 def get_all_tv():
     content = ''
