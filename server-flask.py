@@ -3,20 +3,21 @@ from huya import HuYa
 from douyu import DouYu
 from youku import YouKu
 from bs4 import BeautifulSoup
+from expiringdict import ExpiringDict
 import requests
 app = Flask(__name__)
 
-requestCnt = {}
+cache = ExpiringDict(max_len=100, max_age_seconds=300)
 @app.route('/<plat>/<rid>')
 def get_url(plat,rid):
     if 'huya' == plat:
         h = HuYa(rid)
         url = h.get_real_url()
-        if rid in requestCnt:
-            requestCnt[rid] +=1 
+        if rid in cache:
+            cache[rid] +=1 
         else:
-            requestCnt[rid] = 0
-        item =  requestCnt[rid] % 4
+            cache[rid] = 0
+        item =  cache[rid] % 4
         if item == 0:
             url = url['2000p']
         if item == 1:
