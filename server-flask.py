@@ -6,11 +6,25 @@ from bs4 import BeautifulSoup
 import requests
 app = Flask(__name__)
 
+requestCnt = {}
 @app.route('/<plat>/<rid>')
 def get_url(plat,rid):
     if 'huya' == plat:
         h = HuYa(rid)
-        url = h.get_real_url()['bd']
+        url = h.get_real_url()
+        if rid in requestCnt:
+            requestCnt[rid] +=1 
+        else:
+            requestCnt[rid] = 0
+        item =  requestCnt[rid] % 4
+        if item == 0:
+            url = url['2000p']
+        if item == 1:
+            url = url['bd']
+        if item == 2:
+            url = url['migu-bd']
+        if item == 3:
+            url = url['tx']
     elif 'douyu'  == plat:
         d = DouYu(rid)
         url = d.get_real_url()
