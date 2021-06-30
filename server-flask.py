@@ -19,13 +19,13 @@ def get_url(plat,rid):
             cache[rid] = 0
         item =  cache[rid] % 4
         if item == 0:
-            url = url['2000p']
+            url = url['flv_2m']
         if item == 1:
-            url = url['bd']
+            url = url['hls_2m']
         if item == 2:
-            url = url['migu-bd']
+            url = url['flv']
         if item == 3:
-            url = url['tx']
+            url = url['hls']
     elif 'douyu'  == plat:
         d = DouYu(rid)
         url = d.get_real_url()
