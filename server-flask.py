@@ -19,9 +19,9 @@ def get_url(plat,rid):
             cache[rid] = 0
         item =  cache[rid] % 4
         if item == 0:
-            url = url['flv_2m']
-        if item == 1:
             url = url['hls_2m']
+        if item == 1:
+            url = url['flv_2m']
         if item == 2:
             url = url['flv']
         if item == 3:
