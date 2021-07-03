@@ -32,6 +32,7 @@ def get_url(plat,rid):
     elif 'youku' == plat:
         y = YouKu(rid)
         url = y.get_real_url()
+    print(url)
     return redirect(url, code=302)
 
 def get_nick(item):
