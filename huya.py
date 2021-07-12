@@ -7,7 +7,7 @@ import base64
 import urllib.parse
 import hashlib
 import time
-from bs4 import BeautifulSoup
+import json
 
 
 class HuYa:
@@ -24,73 +24,17 @@ class HuYa:
                               '(KHTML, like Gecko) Chrome/75.0.3770.100 Mobile Safari/537.36 '
             }
             response = requests.get(url=room_url, headers=header).text
-            livelineurl = re.findall(r'"liveLineUrl":"([\s\S]*?)"', response)[0]
-            livelineurl = base64.b64decode(livelineurl).decode('utf-8')
-            if livelineurl:
-                if 'replay' in livelineurl:
-                    real_url = {
-                        'replay': "https:" + livelineurl,
-                    }
-                else:
-                    stream_name = self.get_stream_name(livelineurl)
-                    base_url = 'http://0d6e0ab7f6b628dc024bfbffd1dc637a.v.smtcdns.net/tx.hls.huya.com/src/' + stream_name
-                    real_url = {
-                        'hls': base_url + '.m3u8',
-                        'flv': base_url + '.flv',
-                        'hls_2m': base_url + '.m3u8?ratio=2000',
-                        'flv_2m': base_url + '.flv?ratio=2000'
-                    }
-            else:
+            streamInfo = json.loads(re.findall(r"<script> window.HNF_GLOBAL_INIT = (.*)</script>", response)[0])["roomInfo"]["tLiveInfo"]["tLiveStreamInfo"]["vStreamInfo"]["value"]
+            if streamInfo == []:
                 raise Exception('未开播或直播间不存在')
+            real_url = {}
+            for info in streamInfo:
+                real_url[info["sCdnType"].lower() + "_flv"] = info["sFlvUrl"] + "/" + info["sStreamName"] + "." + info["sFlvUrlSuffix"] + "?" + info["sFlvAntiCode"]
+                real_url[info["sCdnType"].lower() + "_hls"] = info["sHlsUrl"] + "/" + info["sStreamName"] + "." + info["sHlsUrlSuffix"] + "?" + info["sHlsAntiCode"]
         except Exception as e:
             raise Exception('未开播或直播间不存在')
         return real_url
 
-    @staticmethod
-    def get_stream_name(e):
-        i, b = e.split('?')
-        r = i.split('/')
-        s = re.sub(r'.(flv|m3u8)', '', r[-1])
-        return s
-
-    @staticmethod
-    def live(e):
-        i, b = e.split('?')
-        r = i.split('/')
-        s = re.sub(r'.(flv|m3u8)', '', r[-1])
-        c = b.split('&')
-        c = [i for i in c if i != '']
-        n = {i.split('=')[0]: i.split('=')[1] for i in c}
-        fm = urllib.parse.unquote(n['fm'])
-        u = base64.b64decode(fm).decode('utf-8')
-        p = u.split('_')[0]
-        seqid = str(int(time.time() * 1e7))
-        ctype = n['ctype']
-        t = n['t']
-        mf = hashlib.md5((seqid + '|' + ctype + '|' + t).encode('utf-8')).hexdigest()
-        ll = n['wsTime']
-        ratio = n.get('ratio')
-        if ratio is None:
-            ratio = ''
-        uid = '1279523789849'
-        h = '_'.join([p, uid, s, mf, ll])
-        m = hashlib.md5(h.encode('utf-8')).hexdigest()
-        txyp = n['txyp']
-        fs = n['fs']
-        url = "{}?wsSecret={}&wsTime={}&uuid=&uid={}&seqid={}&ratio={}&txyp={}&fs={}&ctype={}&ver=1&t={}".format(
-            i, m, ll, uid, seqid, ratio, txyp, fs, ctype, t)
-        return url
-
-    def get_yqk_content(self):
-        content='虎牙,#genre#\n'
-        url ='https://www.huya.com/g/seeTogether'
-        text = requests.get(url).text
-        soup = BeautifulSoup(text, 'html.parser')
-        for ultag  in soup.find_all('ul', {'class': 'live-list clearfix'}):
-             for litag in ultag.find_all('li'):
-                if litag:
-                    content += ('{},http://192.168.123.2:8088/huya{}\n'.format(litag.find('a',{'class','title'}).text,litag.find('a',{'class','title'}, href=True)['href'].replace('https://www.huya.com','')))
-        return content
 
 def get_real_url(rid):
     try:
@@ -105,4 +49,3 @@ def get_real_url(rid):
 if __name__ == '__main__':
     rid = input('输入虎牙直播房间号：\n')
     print(get_real_url(rid))
-
