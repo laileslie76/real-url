@@ -22,7 +22,7 @@ class DouYu:
 
     def __init__(self, rid):
         """
-        房间号通常为1~7位纯数字，浏览器地址栏中看到的房间号不一定是真实rid.
+        房间号通常为1~8位纯数字，浏览器地址栏中看到的房间号不一定是真实rid.
         Args:
             rid:
         """
@@ -32,8 +32,8 @@ class DouYu:
 
         self.s = requests.Session()
         self.res = self.s.get('https://m.douyu.com/' + str(rid)).text
-        result = re.search(r'rid":(\d{1,7}),"vipId', self.res)
-        self.live_rate = 0
+        result = re.search(r'rid":(\d{1,8}),"vipId', self.res)
+
         if result:
             self.rid = result.group(1)
         else:
@@ -61,7 +61,7 @@ class DouYu:
         key = ''
         if data:
             rtmp_live = data['rtmp_live']
-            key = re.search(r'(\d{1,7}[0-9a-zA-Z]+)_?\d{0,4}(/playlist|.m3u8)', rtmp_live).group(1)
+            key = re.search(r'(\d{1,8}[0-9a-zA-Z]+)_?\d{0,4}(/playlist|.m3u8)', rtmp_live).group(1)
         return error, key
 
     def get_js(self):
@@ -83,7 +83,7 @@ class DouYu:
 
         url = 'https://m.douyu.com/api/room/ratestream'
         res = self.s.post(url, params=params).text
-        key = re.search(r'(\d{1,7}[0-9a-zA-Z]+)_?\d{0,4}(.m3u8|/playlist)', res).group(1)
+        key = re.search(r'(\d{1,8}[0-9a-zA-Z]+)_?\d{0,4}(.m3u8|/playlist)', res).group(1)
 
         return key
 
@@ -126,4 +126,12 @@ class DouYu:
             raise Exception('房间未开播')
         else:
             key = self.get_js()
-        return "http://dyscdnali1.douyucdn.cn/live/{}.flv?uuid=".format(key)
+        real_url = {}
+        real_url["flv"] = "http://dyscdnali1.douyucdn.cn/live/{}.flv?uuid=".format(key)
+        real_url["x-p2p"] = "http://tx2play1.douyucdn.cn/live/{}.xs?uuid=".format(key)
+        return real_url
+
+if __name__ == '__main__':
+    r = input('输入斗鱼直播间号：\n')
+    s = DouYu(r)
+    print(s.get_real_url())
