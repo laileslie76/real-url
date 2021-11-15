@@ -3,7 +3,11 @@ from douyu import DouYu
 from youku import YouKu
 from bs4 import BeautifulSoup
 from expiringdict import ExpiringDict
-import requests
+import requests,base64,json
+import io
+import sys
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer,encoding='utf8') 
+
 app = Flask(__name__)
 
 cache = ExpiringDict(max_len=100, max_age_seconds=300)
@@ -61,6 +65,59 @@ def get_all_tv():
     response.mimetype = "text/plain"
     return response
 
+@app.route('/v2ml')
+def v2ml_convert():
+    sub_url = request.args['sub_url']
+    hostname = request.args['hostname']
+    return_content = requests.get(sub_url,headers={'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0'}).content
+    if (len(return_content) % 3 == 1):
+        return_content += b"="
+    elif (len(return_content) % 3 == 2):
+        return_content += b"=="
+    print(return_content)
+    base64Str = base64.urlsafe_b64decode(return_content)  # 进行base64解码
+    print("解码后内容：", base64Str)
+    # print(sub_url)
+
+
+
+    share_links = base64Str.splitlines()  # \r\n进行分行
+    add = ""
+
+    for share_link in share_links:
+        dict = {}
+        share_link = bytes.decode(share_link)  # 转换类型
+        if share_link.find("vmess://") == -1:
+                # print("")
+               # vmesscode = "抱歉，您的订阅链接不是vmess链接。"
+            pass
+        else:
+            print("服务器参数：", share_link)
+            shar = share_link.split("ss://")
+            jj = base64.urlsafe_b64decode(shar[1]).decode('UTF-8')  # 解析VMESS参数得到josn字符串 后面解析unicode
+                # jj = base64.urlsafe_b64decode(shar[1]) # 解析VMESS参数得到josn字符串 后面解析unicode
+            print("vmess参数解析得到josn内容：",jj)
+
+            par = json.loads(jj)  # 转换成字典
+            if par['port'] != '80':
+                continue
+            add = add + vm(par,hostname)
+    dic3 = base64.b64encode(add.encode('UTF-8'))
+    vmesscode = dic3
+    print("订阅内容：")
+    print(dic3)
+    response = make_response(dic3, 200)
+    response.mimetype = "text/plain"
+    return response
+
+
+
+def vm(par,hostname):
+    par["host"] = hostname
+    dic = json.dumps(par)  # 转换成json
+    dic1 = base64.b64encode(dic.encode('UTF-8'))  # 转换成base64字符串
+    dic2 = 'vmess://' + bytes.decode(dic1) + "\r\n"  # 拼接vmess头
+    return dic2
 
 import requests
 import re
@@ -112,6 +169,7 @@ def get_real_url(room_id):
     except:
         real_url = '未开播或直播间不存在'
     return real_url
+
 
 
 if __name__ == '__main__':
