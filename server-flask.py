@@ -18,7 +18,7 @@ def get_url(plat,rid):
         url = get_real_url(rid)
     elif 'douyu'  == plat:
         d = DouYu(rid)
-        url = d.get_real_url()
+        url = d.get_real_url()['flv']
     elif 'youku' == plat:
         y = YouKu(rid)
         url = y.get_real_url()
