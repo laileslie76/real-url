@@ -9,7 +9,7 @@ import sys
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer,encoding='utf8') 
 
 app = Flask(__name__)
-
+url=''
 cache = ExpiringDict(max_len=100, max_age_seconds=300)
 @app.route('/<plat>/<rid>')
 def get_url(plat,rid):
@@ -64,6 +64,52 @@ def get_all_tv():
     response = make_response(content, 200)
     response.mimetype = "text/plain"
     return response
+
+def get_douyu_content_json(group,name):
+    data = {'group':name,'channels':[]}
+    url ='https://www.douyu.com/' + group
+    text = requests.get(url).text
+    soup = BeautifulSoup(text, 'html.parser')
+    for ultag  in soup.find_all('ul', {'class': 'layout-Cover-list'}):
+         for litag in ultag.find_all('li'):
+            if litag:
+                item={
+                    'name':get_nick(litag.find('div',{'class','DyListCover-userName'}))  + litag.find('h3',{'class','DyListCover-intro'}).text,
+                    'urls':[]
+                }
+                item['urls'].append('http://192.168.123.2:8088/douyu{}'.format(litag.find('a', href=True)['href']))
+                data['channels'].append(item)
+    return data
+
+def get_huya_content_json(group,name):
+    data = {'group':name,'channels':[]}
+    url ='https://www.huya.com/g/' + group
+    text = requests.get(url).text
+    soup = BeautifulSoup(text, 'html.parser')
+    for ultag  in soup.find_all('ul', {'class': 'live-list clearfix'}):
+         for litag in ultag.find_all('li'):
+            if litag:
+                item={
+                    'name':get_nick(litag.find('i',{'class','nick'})) + litag.find('a',{'class','title'}).text,
+                    'urls':[]
+                }
+                item['urls'].append('http://192.168.123.2:8088/huya{}'.format(litag.find('a',{'class','title'}, href=True)['href'].replace('https://www.huya.com','')))
+                data['channels'].append(item)
+    return data
+
+@app.route('/maotv')
+def get_mao_tv():
+    with open("D:\\Users\\lppsu\\Downloads\\88.json", encoding='utf-8') as f:
+        data = json.load(f)
+        data['lives'].append(get_douyu_content_json('g_yqk','斗鱼一起看'))
+        data['lives'].append(get_douyu_content_json('g_LOL','斗鱼LOL'))
+        data['lives'].append(get_huya_content_json('seeTogether','虎牙一起看'))
+        data['lives'].append(get_huya_content_json('lol','虎牙lol'))
+
+
+        response = make_response(jsonify(data), 200)
+        response.mimetype = "text/plain"
+        return response
 
 @app.route('/v2ml')
 def v2ml_convert():
@@ -173,4 +219,5 @@ def get_real_url(room_id):
 
 
 if __name__ == '__main__':
+    app.config['JSON_AS_ASCII'] = False
     app.run(host='0.0.0.0',port=8088)
