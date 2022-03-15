@@ -6,7 +6,8 @@ from expiringdict import ExpiringDict
 import requests,base64,json
 import io
 import sys
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer,encoding='utf8') 
+import re
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer,encoding='utf8')
 
 app = Flask(__name__)
 url=''
@@ -37,7 +38,7 @@ def get_douyu_content(group,name):
     for ultag  in soup.find_all('ul', {'class': 'layout-Cover-list'}):
          for litag in ultag.find_all('li'):
             if litag:
-                content += ('{},http://192.168.123.2:8088/douyu{}\n'.format(get_nick(litag.find('div',{'class','DyListCover-userName'}))  + litag.find('h3',{'class','DyListCover-intro'}).text,litag.find('a', href=True)['href']))
+                content += ('{},http://oracle.lppsuixn.tk:8088/douyu{}\n'.format(get_nick(litag.find('div',{'class','DyListCover-userName'}))  + litag.find('h3',{'class','DyListCover-intro'}).text,litag.find('a', href=True)['href']))
     return content
 
 def get_huya_content(group,name):
@@ -48,9 +49,9 @@ def get_huya_content(group,name):
     for ultag  in soup.find_all('ul', {'class': 'live-list clearfix'}):
          for litag in ultag.find_all('li'):
             if litag:
-                content += ('{},http://192.168.123.2:8088/huya{}\n'.format(get_nick(litag.find('i',{'class','nick'})) + litag.find('a',{'class','title'}).text,litag.find('a',{'class','title'}, href=True)['href'].replace('https://www.huya.com','')))
+                content += ('{},http://oracle.lppsuixn.tk:8088/huya{}\n'.format(get_nick(litag.find('i',{'class','nick'})) + litag.find('a',{'class','title'}).text,litag.find('a',{'class','title'}, href=True)['href'].replace('https://www.huya.com','')))
     return content
-    
+
 @app.route('/alltv')
 def get_all_tv():
     content = ''
@@ -60,7 +61,7 @@ def get_all_tv():
     content += get_huya_content('seeTogether','虎牙一起看')
     content += get_huya_content('lol','虎牙lol')
 
-    
+
     response = make_response(content, 200)
     response.mimetype = "text/plain"
     return response
@@ -77,7 +78,7 @@ def get_douyu_content_json(group,name):
                     'name':get_nick(litag.find('div',{'class','DyListCover-userName'}))  + litag.find('h3',{'class','DyListCover-intro'}).text,
                     'urls':[]
                 }
-                item['urls'].append('http://192.168.123.2:8088/douyu{}'.format(litag.find('a', href=True)['href']))
+                item['urls'].append('http://oracle.lppsuixn.tk:8088/douyu{}'.format(litag.find('a', href=True)['href']))
                 data['channels'].append(item)
     return data
 
@@ -93,14 +94,36 @@ def get_huya_content_json(group,name):
                     'name':get_nick(litag.find('i',{'class','nick'})) + litag.find('a',{'class','title'}).text,
                     'urls':[]
                 }
-                item['urls'].append('http://192.168.123.2:8088/huya{}'.format(litag.find('a',{'class','title'}, href=True)['href'].replace('https://www.huya.com','')))
+                item['urls'].append('http://oracle.lppsuixn.tk:8088/huya{}'.format(litag.find('a',{'class','title'}, href=True)['href'].replace('https://www.huya.com','')))
+                # if len(data['channels']) > 5:
+                #     continue
                 data['channels'].append(item)
     return data
 
+def get_iptv_json(url,name):
+    data = {'group':name,'channels':[]}
+    text = requests.get(url,headers={'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0'}).text
+    channel_map = {}
+    for line in text.split():
+        n,u = line.split(',')
+        if n not in channel_map:
+            channel_map[n] = {
+                'name':n,
+                'urls':[]
+            }
+        channel_map[n]['urls'].append(u)
+    for k,v in channel_map.items():
+        data['channels'].append(v)
+    return data
 @app.route('/maotv')
 def get_mao_tv():
     with open("D:\\Users\\lppsu\\Downloads\\88.json", encoding='utf-8') as f:
         data = json.load(f)
+        data['lives'] = []
+        data['lives'].append(get_iptv_json('https://cdn.jsdelivr.net/gh/abc1763613206/myiptv@latest/utf8/groups/cctv-simple.txt','央视'))
+        data['lives'].append(get_iptv_json('https://cdn.jsdelivr.net/gh/abc1763613206/myiptv@latest/utf8/groups/weishi-simple.txt','卫视'))
+        data['lives'].append(get_iptv_json('https://cdn.jsdelivr.net/gh/abc1763613206/myiptv@latest/utf8/groups/difang-simple.txt','地方'))
+        data['lives'].append(get_iptv_json('https://cdn.jsdelivr.net/gh/abc1763613206/myiptv@latest/utf8/groups/special-simple.txt','特殊'))
         data['lives'].append(get_douyu_content_json('g_yqk','斗鱼一起看'))
         data['lives'].append(get_douyu_content_json('g_LOL','斗鱼LOL'))
         data['lives'].append(get_huya_content_json('seeTogether','虎牙一起看'))
