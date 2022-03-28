@@ -163,7 +163,9 @@ def v2ml809_convert():
 
             par = json.loads(jj)  # 转换成字典
             if par['port'] != '809':
-                continue
+                continue   
+            if '华南' in par['ps']:
+                par['ps'] = '华南'
             add = add + vm(par,par['host'])
     dic3 = base64.b64encode(add.encode('UTF-8'))
     vmesscode = dic3
