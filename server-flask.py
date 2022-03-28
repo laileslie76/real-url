@@ -19,7 +19,7 @@ def get_url(plat,rid):
         url = get_real_url(rid)
     elif 'douyu'  == plat:
         d = DouYu(rid)
-        url = d.get_real_url()['flv']
+        url = d.get_real_url()['2000p']
     elif 'youku' == plat:
         y = YouKu(rid)
         url = y.get_real_url()
@@ -117,13 +117,13 @@ def get_iptv_json(url,name):
     return data
 @app.route('/maotv')
 def get_mao_tv():
-    with open("D:\\Users\\lppsu\\Downloads\\88.json", encoding='utf-8') as f:
+    with open("/tv/ts.json", encoding='utf-8') as f:
         data = json.load(f)
         data['lives'] = []
-        data['lives'].append(get_iptv_json('https://cdn.jsdelivr.net/gh/abc1763613206/myiptv@latest/utf8/groups/cctv-simple.txt','央视'))
-        data['lives'].append(get_iptv_json('https://cdn.jsdelivr.net/gh/abc1763613206/myiptv@latest/utf8/groups/weishi-simple.txt','卫视'))
-        data['lives'].append(get_iptv_json('https://cdn.jsdelivr.net/gh/abc1763613206/myiptv@latest/utf8/groups/difang-simple.txt','地方'))
-        data['lives'].append(get_iptv_json('https://cdn.jsdelivr.net/gh/abc1763613206/myiptv@latest/utf8/groups/special-simple.txt','特殊'))
+        data['lives'].append(get_iptv_json('https://cdn.jsdelivr.net/gh/lppsuixn/myiptv@latest/utf8/groups/cctv-simple.txt','央视'))
+        data['lives'].append(get_iptv_json('https://cdn.jsdelivr.net/gh/lppsuixn/myiptv@latest/utf8/groups/weishi-simple.txt','卫视'))
+        data['lives'].append(get_iptv_json('https://cdn.jsdelivr.net/gh/lppsuixn/myiptv@latest/utf8/groups/difang-simple.txt','地方'))
+        data['lives'].append(get_iptv_json('https://cdn.jsdelivr.net/gh/lppsuixn/myiptv@latest/utf8/groups/special-simple.txt','特殊'))
         data['lives'].append(get_douyu_content_json('g_yqk','斗鱼一起看'))
         data['lives'].append(get_douyu_content_json('g_LOL','斗鱼LOL'))
         data['lives'].append(get_huya_content_json('seeTogether','虎牙一起看'))
@@ -133,6 +133,46 @@ def get_mao_tv():
         response = make_response(jsonify(data), 200)
         response.mimetype = "text/plain"
         return response
+@app.route('/v2ml809')
+def v2ml809_convert():
+    sub_url = request.args['sub_url']
+    return_content = requests.get(sub_url,headers={'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0'}).content
+    if (len(return_content) % 3 == 1):
+        return_content += b"="
+    elif (len(return_content) % 3 == 2):
+        return_content += b"=="
+    print(return_content)
+    base64Str = base64.urlsafe_b64decode(return_content)  # 进行base64解码
+    print("解码后内容：", base64Str)
+    share_links = base64Str.splitlines()  # \r\n进行分行
+    add = ""
+
+    for share_link in share_links:
+        dict = {}
+        share_link = bytes.decode(share_link)  # 转换类型
+        if share_link.find("vmess://") == -1:
+                # print("")
+               # vmesscode = "抱歉，您的订阅链接不是vmess链接。"
+            pass
+        else:
+            print("服务器参数：", share_link)
+            shar = share_link.split("ss://")
+            jj = base64.urlsafe_b64decode(shar[1]).decode('UTF-8')  # 解析VMESS参数得到josn字符串 后面解析unicode
+                # jj = base64.urlsafe_b64decode(shar[1]) # 解析VMESS参数得到josn字符串 后面解析unicode
+            print("vmess参数解析得到josn内容：",jj)
+
+            par = json.loads(jj)  # 转换成字典
+            if par['port'] != '809':
+                continue
+            add = add + vm(par,par['host'])
+    dic3 = base64.b64encode(add.encode('UTF-8'))
+    vmesscode = dic3
+    print("订阅内容：")
+    print(dic3)
+    response = make_response(dic3, 200)
+    response.mimetype = "text/plain"
+    return response
+
 
 @app.route('/v2ml')
 def v2ml_convert():
