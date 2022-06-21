@@ -166,6 +166,8 @@ def v2ml809_convert():
                 continue   
             if '华南' in par['ps']:
                 par['ps'] = '华南'
+            if '华中' in par['ps']:
+                par['ps'] = '华中'
             add = add + vm(par,par['host'])
     dic3 = base64.b64encode(add.encode('UTF-8'))
     vmesscode = dic3
@@ -212,6 +214,12 @@ def v2ml_convert():
             par = json.loads(jj)  # 转换成字典
             if par['port'] != '80':
                 continue
+            if 'network' in par and par['network'] != 'ws':
+                continue
+            if 'net' in par and par['net'] != 'ws':
+                continue
+            #if 'path' in par:
+            #    par['path']='/index'
             add = add + vm(par,hostname)
     dic3 = base64.b64encode(add.encode('UTF-8'))
     vmesscode = dic3
