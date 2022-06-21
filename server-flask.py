@@ -133,6 +133,49 @@ def get_mao_tv():
         response = make_response(jsonify(data), 200)
         response.mimetype = "text/plain"
         return response
+
+def get_iptv(url,name):
+    data = '##{}##\n'.format(name)
+    text = requests.get(url,headers={'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0'}).text
+    return data+'\n' + text
+
+def get_huya_content(group,name):
+    data = '##{}##\n'.format(name)
+    url ='https://www.huya.com/g/' + group
+    text = requests.get(url).text
+    soup = BeautifulSoup(text, 'html.parser')
+    for ultag  in soup.find_all('ul', {'class': 'live-list clearfix'}):
+         for litag in ultag.find_all('li'):
+            if litag:
+                data += '{},{}\n'.format(get_nick(litag.find('i',{'class','nick'})) + litag.find('a',{'class','title'}).text,'http://oracle.lppsuixn.tk:8088/huya{}'.format(litag.find('a',{'class','title'}, href=True)['href'].replace('https://www.huya.com','')))
+    return data
+
+def get_douyu_content(group,name):
+    data = '##{}##\n'.format(name)
+    url ='https://www.douyu.com/' + group
+    text = requests.get(url).text
+    soup = BeautifulSoup(text, 'html.parser')
+    for ultag  in soup.find_all('ul', {'class': 'layout-Cover-list'}):
+         for litag in ultag.find_all('li'):
+            if litag:
+                data += '{},{}'.format(get_nick(litag.find('div',{'class','DyListCover-userName'}))  + litag.find('h3',{'class','DyListCover-intro'}).text,'http://oracle.lppsuixn.tk:8088/douyu{}'.format(litag.find('a', href=True)['href']))
+    return data
+    
+@app.route('/bblive')
+def get_bb_live():
+    data = ''
+    data += get_iptv('https://cdn.jsdelivr.net/gh/lppsuixn/myiptv@latest/utf8/groups/cctv-simple.txt','央视')
+    data += get_iptv('https://cdn.jsdelivr.net/gh/lppsuixn/myiptv@latest/utf8/groups/weishi-simple.txt','卫视')
+    data += get_iptv('https://cdn.jsdelivr.net/gh/lppsuixn/myiptv@latest/utf8/groups/special-simple.txt','特殊')
+    data += get_huya_content('seeTogether','虎牙一起看')
+    data += get_huya_content('lol','虎牙lol')
+    data += get_douyu_content('g_yqk','斗鱼一起看')
+    data += get_douyu_content('g_LOL','斗鱼LOL')
+
+    response = make_response(data, 200)
+    response.mimetype = "text/plain"
+    return response
+
 @app.route('/v2ml809')
 def v2ml809_convert():
     sub_url = request.args['sub_url']
