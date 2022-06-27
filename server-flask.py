@@ -133,6 +133,25 @@ def get_mao_tv():
         response = make_response(jsonify(data), 200)
         response.mimetype = "text/plain"
         return response
+@app.route('/maotv1')
+def get_mao_tv1():
+    with open("/tv/ts1.json", encoding='utf-8') as f:
+        data = json.load(f)
+        data['lives'] = []
+        data['lives'].append(get_iptv_json('https://cdn.jsdelivr.net/gh/lppsuixn/myiptv@latest/utf8/groups/cctv-simple.txt','央视'))
+        data['lives'].append(get_iptv_json('https://cdn.jsdelivr.net/gh/lppsuixn/myiptv@latest/utf8/groups/weishi-simple.txt','卫视'))
+        data['lives'].append(get_iptv_json('https://cdn.jsdelivr.net/gh/lppsuixn/myiptv@latest/utf8/groups/difang-simple.txt','地方'))
+        data['lives'].append(get_iptv_json('https://cdn.jsdelivr.net/gh/lppsuixn/myiptv@latest/utf8/groups/special-simple.txt','特殊'))
+        data['lives'].append(get_douyu_content_json('g_yqk','斗鱼一起看'))
+        data['lives'].append(get_douyu_content_json('g_LOL','斗鱼LOL'))
+        data['lives'].append(get_huya_content_json('seeTogether','虎牙一起看'))
+        data['lives'].append(get_huya_content_json('lol','虎牙lol'))
+
+
+        response = make_response(jsonify(data), 200)
+        response.mimetype = "text/plain"
+        return response
+
 
 def get_iptv(url,name):
     data = '##{}##\n'.format(name)
