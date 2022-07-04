@@ -1,6 +1,7 @@
 from flask import Flask,request, jsonify,redirect,make_response
 from douyu import DouYu
 from youku import YouKu
+from huya import huya
 from bs4 import BeautifulSoup
 from expiringdict import ExpiringDict
 import requests,base64,json
@@ -16,7 +17,9 @@ cache = ExpiringDict(max_len=100, max_age_seconds=300)
 def get_url(plat,rid):
     if 'huya' == plat:
         # h = HuYa(rid)
-        url = get_real_url(rid)
+        
+        #url = get_real_url(rid)
+        url = huya(rid, 1279522733647, 1).get_real_url()[0]
     elif 'douyu'  == plat:
         d = DouYu(rid)
         url = d.get_real_url()['2000p']
@@ -117,7 +120,7 @@ def get_iptv_json(url,name):
     return data
 @app.route('/maotv')
 def get_mao_tv():
-    with open("/tv/ts.json", encoding='utf-8') as f:
+    with open("/tv/0702/wqts2.json", encoding='utf-8') as f:
         data = json.load(f)
         data['lives'] = []
         data['lives'].append(get_iptv_json('https://cdn.jsdelivr.net/gh/lppsuixn/myiptv@latest/utf8/groups/cctv-simple.txt','央视'))

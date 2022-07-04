@@ -68,7 +68,7 @@
 {"key":"csp_appysv2_蓝猫影院","name":"蓝猫影院(优)","type":3,"api":"csp_AppYsV2","searchable":1,"quickSearch":1,"filterable":1,"ext":"http://www.baofu111.top/mogai_api.php/v1.vod"},
 {"key":"csp_appysv2_蜜蜂影视","name":"蜜蜂影视(优)","type":3,"api":"csp_AppYsV2","searchable":1,"quickSearch":1,"filterable":1,"ext":"http://app.f8tp.com/lvdou_api.php/v1.vod"},
 {"key":"csp_appysv2_麻瓜视频","name":"麻瓜视频(优)","type":3,"api":"csp_AppYsV2","searchable":1,"quickSearch":1,"filterable":1,"ext":"http://aliyun.k8aa.com/mogai_api.php/v1.vod"},
-{"key":"csp_appysv2_美剧虫","name":"美剧虫(优)","type":3,"api":"csp_AppYsV2","searchable":1,"quickSearch":1,"filterable":1,"ext":"https://meijuchong.com/api.php/v1.vod"},
+{"key":"csp_appys_美剧虫","name":"美剧虫(优)","type":3,"api":"csp_AppYs","searchable":1,"quickSearch":1,"filterable":1,"ext":"https://meijuchong.com/api.php/v1.vod"},
 {"key":"csp_appysv2_南府影视","name":"南府影视(优)","type":3,"api":"csp_AppYsV2","searchable":1,"quickSearch":1,"filterable":1,"ext":"http://iapp.nfuxs.club/dnmb.php/v1.vod"},
 {"key":"csp_appysv2_暖光影视","name":"暖光影视(优)","type":3,"api":"csp_AppYsV2","searchable":1,"quickSearch":1,"filterable":1,"ext":"https://app.bl210.com/api.php/v1.vod"},
 {"key":"csp_appysv2_柠柚影视","name":"柠柚影视(优)","type":3,"api":"csp_AppYsV2","searchable":1,"quickSearch":1,"filterable":1,"ext":"http://nu.e4tv.cn/lvdou_api.php/v1.vod"},
@@ -167,7 +167,17 @@
 {"key":"csp_appysv2_虾皮视频","name":"虾皮视频(IPTV)","type":3,"api":"csp_AppYsV2","searchable":1,"quickSearch":0,"filterable":1,"ext":"http://tv.cmt8.xyz/api.php/iptv/vod/"},
 {"key":"csp_appysv2_小极TV","name":"小极TV(IPTV)","type":3,"api":"csp_AppYsV2","searchable":1,"quickSearch":0,"filterable":1,"ext":"http://api.8d8q.com/mmv/api.php/Chengcheng/vod/"},
 {"key":"csp_appysv2_小熊猫TV","name":"小熊猫TV(IPTV)","type":3,"api":"csp_AppYsV2","searchable":1,"quickSearch":0,"filterable":1,"ext":"http://tv2.hetaoys.vip/api.php/iptv/vod/"},
-{"key":"csp_appysv2_影视阁","name":"影视阁(IPTV)","type":3,"api":"csp_AppYsV2","searchable":1,"quickSearch":0,"filterable":1,"ext":"http://216.98.10.85/api.php/iptv/vod/"}
+{"key":"csp_appysv2_影视阁","name":"影视阁(IPTV)","type":3,"api":"csp_AppYsV2","searchable":1,"quickSearch":0,"filterable":1,"ext":"http://216.98.10.85/api.php/iptv/vod/"},
+ {
+      "key": "csp_xpath_huya",
+      "name": "虎牙直播",
+      "type": 3,
+      "api": "csp_XPathMacFilter",
+      "searchable": 1,
+      "quickSearch": 1,
+      "filterable": 1,
+      "ext": "http://takoph.evai.pl/kino/huya.json"
+    }
 ],
  
 "lives": [
