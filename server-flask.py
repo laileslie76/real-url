@@ -52,7 +52,7 @@ def get_huya_content(group,name):
     for ultag  in soup.find_all('ul', {'class': 'live-list clearfix'}):
          for litag in ultag.find_all('li'):
             if litag:
-                content += ('{},http://epg.112114.xyz/huya{}\n'.format(get_nick(litag.find('i',{'class','nick'})) + litag.find('a',{'class','title'}).text,litag.find('a',{'class','title'}, href=True)['href'].replace('https://www.huya.com','')))
+                content += ('{},http://oracle.lppsuixn.tk:8088/huya{}\n'.format(get_nick(litag.find('i',{'class','nick'})) + litag.find('a',{'class','title'}).text,litag.find('a',{'class','title'}, href=True)['href'].replace('https://www.huya.com','')))
     return content
 
 @app.route('/alltv')
@@ -97,7 +97,7 @@ def get_huya_content_json(group,name):
                     'name':get_nick(litag.find('i',{'class','nick'})) + litag.find('a',{'class','title'}).text,
                     'urls':[]
                 }
-                item['urls'].append('http://epg.112114.xyz/huya{}'.format(litag.find('a',{'class','title'}, href=True)['href'].replace('https://www.huya.com','')))
+                item['urls'].append('http://oracle.lppsuixn.tk:8088/huya{}'.format(litag.find('a',{'class','title'}, href=True)['href'].replace('https://www.huya.com','')))
                 # if len(data['channels']) > 5:
                 #     continue
                 data['channels'].append(item)
@@ -123,8 +123,8 @@ def get_mao_tv():
     with open("/tv/0702/wqts2.json", encoding='utf-8') as f:
         data = json.load(f)
         data['lives'] = []
-        data['lives'].append(get_iptv_json('https://cdn.jsdelivr.net/gh/lppsuixn/myiptv@latest/utf8/groups/cctv-simple.txt','央视'))
-        data['lives'].append(get_iptv_json('https://cdn.jsdelivr.net/gh/lppsuixn/myiptv@latest/utf8/groups/weishi-simple.txt','卫视'))
+        data['lives'].append(get_iptv_json('https://raw.githubusercontent.com/lppsuixn/myiptv/main/utf8/groups/cctv-simple.txt','央视'))
+        data['lives'].append(get_iptv_json('https://raw.githubusercontent.com/lppsuixn/myiptv/main/utf8/groups/weishi-simple.txt','卫视'))
         data['lives'].append(get_iptv_json('https://cdn.jsdelivr.net/gh/lppsuixn/myiptv@latest/utf8/groups/difang-simple.txt','地方'))
         data['lives'].append(get_iptv_json('https://cdn.jsdelivr.net/gh/lppsuixn/myiptv@latest/utf8/groups/special-simple.txt','特殊'))
         data['lives'].append(get_douyu_content_json('g_yqk','斗鱼一起看'))

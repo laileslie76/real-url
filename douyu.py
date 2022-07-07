@@ -32,7 +32,7 @@ class DouYu:
         self.t13 = str(int((time.time() * 1000)))
 
         self.s = requests.Session()
-        self.res = self.s.get('https://m.douyu.com/' + str(rid), timeout=30).text
+        self.res = self.s.get('https://m.douyu.com/' + str(rid), timeout=90).text
         result = re.search(r'rid":(\d{1,8}),"vipId', self.res)
 
         if result:
@@ -56,7 +56,7 @@ class DouYu:
             'time': self.t13,
             'auth': auth
         }
-        res = self.s.post(url, headers=headers, data=data, timeout=30).json()
+        res = self.s.post(url, headers=headers, data=data, timeout=90).json()
         error = res['error']
         data = res['data']
         key = ''
@@ -85,7 +85,7 @@ class DouYu:
         params += '&ver=219032101&rid={}&rate=-1'.format(self.rid)
 
         url = 'https://m.douyu.com/api/room/ratestream'
-        res = self.s.post(url, params=params, timeout=30).json()['data']
+        res = self.s.post(url, params=params, timeout=90).json()['data']
         key = re.search(r'(\d{1,8}[0-9a-zA-Z]+)_?\d{0,4}(.m3u8|/playlist)', res['url']).group(1)
 
         return key, res['url']
@@ -97,7 +97,7 @@ class DouYu:
         :param rate: 1流畅；2高清；3超清；4蓝光4M；0蓝光8M或10M
         :return: JSON格式
         """
-        res = self.s.get('https://www.douyu.com/' + str(self.rid), timeout=30).text
+        res = self.s.get('https://www.douyu.com/' + str(self.rid), timeout=90).text
         result = re.search(r'(vdwdae325w_64we[\s\S]*function ub98484234[\s\S]*?)function', res).group(1)
         func_ub9 = re.sub(r'eval.*?;}', 'strc;}', result)
         js = execjs.compile(func_ub9)
@@ -115,7 +115,7 @@ class DouYu:
 
         params += '&cdn={}&rate={}'.format(cdn, rate)
         url = 'https://www.douyu.com/lapi/live/getH5Play/{}'.format(self.rid)
-        res = self.s.post(url, params=params, timeout=30).json()['data']
+        res = self.s.post(url, params=params, timeout=90).json()['data']
 
         return res['rtmp_url'] + '/' + res['rtmp_live']
 
