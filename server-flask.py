@@ -9,6 +9,7 @@ import io
 import sys
 import re
 import random
+import bilibili
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer,encoding='utf8')
 
 app = Flask(__name__)
@@ -26,6 +27,8 @@ def get_url(plat,rid):
     elif 'youku' == plat:
         y = YouKu(rid)
         url = y.get_real_url()
+    elif 'bili' == plat:
+        url = bilibili.get_real_url(rid)['线路1']
     print(url)
     return redirect(url, code=302)
 
@@ -85,6 +88,23 @@ def get_douyu_content_json(group,name):
                 data['channels'].append(item)
     return data
 
+def get_bili_content_json(parent_area_id,area_id,name):
+    data = {'group':name,'channels':[]}
+    url = 'https://api.live.bilibili.com/xlive/web-interface/v1/second/getList?platform=web&parent_area_id={}&area_id={}&sort_type=online&page={}'
+    for id in range(1,5):
+        newUrl = url.format(parent_area_id,area_id,id)
+        text = requests.get(newUrl).text
+        data = json.loads(text)
+        for d in data['data']['list']:
+            item = {
+                'name': d['title'],
+                'urls':[d['http://oracle.lppsuixn.tk:8088/bili/{}'.format(d['roomid'])]]
+            }
+
+            data['channels'].append(item)
+        return data
+
+
 def get_huya_content_json(group,name):
     data = {'group':name,'channels':[]}
     url ='https://www.huya.com/g/' + group
@@ -127,10 +147,11 @@ def get_mao_tv():
         data['lives'].append(get_iptv_json('https://raw.githubusercontent.com/lppsuixn/myiptv/main/utf8/groups/weishi-simple.txt','卫视'))
         data['lives'].append(get_iptv_json('https://cdn.jsdelivr.net/gh/lppsuixn/myiptv@latest/utf8/groups/difang-simple.txt','地方'))
         data['lives'].append(get_iptv_json('https://cdn.jsdelivr.net/gh/lppsuixn/myiptv@latest/utf8/groups/special-simple.txt','特殊'))
-        data['lives'].append(get_douyu_content_json('g_yqk','斗鱼一起看'))
-        data['lives'].append(get_douyu_content_json('g_LOL','斗鱼LOL'))
-        data['lives'].append(get_huya_content_json('seeTogether','虎牙一起看'))
         data['lives'].append(get_huya_content_json('lol','虎牙lol'))
+        data['lives'].append(get_douyu_content_json('g_LOL','斗鱼LOL'))
+        data['lives'].append(get_bili_content_json('2','0','哔哩LOL'))
+        data['lives'].append(get_douyu_content_json('g_yqk','斗鱼一起看'))
+        data['lives'].append(get_huya_content_json('seeTogether','虎牙一起看'))
 
 
         response = make_response(jsonify(data), 200)
