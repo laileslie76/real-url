@@ -1,7 +1,7 @@
 from flask import Flask,request, jsonify,redirect,make_response
 from douyu import DouYu
 from youku import YouKu
-from huya import huya
+import huya
 from bs4 import BeautifulSoup
 from expiringdict import ExpiringDict
 import requests,base64,json
@@ -18,8 +18,7 @@ def get_url(plat,rid):
     if 'huya' == plat:
         # h = HuYa(rid)
         
-        #url = get_real_url(rid)
-        url = huya(rid, 1279522733647, 1).get_real_url()[0]
+        url = get_real_url(rid)
     elif 'douyu'  == plat:
         d = DouYu(rid)
         url = d.get_real_url()['2000p']
@@ -52,7 +51,7 @@ def get_huya_content(group,name):
     for ultag  in soup.find_all('ul', {'class': 'live-list clearfix'}):
          for litag in ultag.find_all('li'):
             if litag:
-                content += ('{},http://oracle.lppsuixn.tk:8088/huya{}\n'.format(get_nick(litag.find('i',{'class','nick'})) + litag.find('a',{'class','title'}).text,litag.find('a',{'class','title'}, href=True)['href'].replace('https://www.huya.com','')))
+                content += ('{},http://epg.112114.xyz/huya{}\n'.format(get_nick(litag.find('i',{'class','nick'})) + litag.find('a',{'class','title'}).text,litag.find('a',{'class','title'}, href=True)['href'].replace('https://www.huya.com','')))
     return content
 
 @app.route('/alltv')
@@ -97,7 +96,7 @@ def get_huya_content_json(group,name):
                     'name':get_nick(litag.find('i',{'class','nick'})) + litag.find('a',{'class','title'}).text,
                     'urls':[]
                 }
-                item['urls'].append('http://oracle.lppsuixn.tk:8088/huya{}'.format(litag.find('a',{'class','title'}, href=True)['href'].replace('https://www.huya.com','')))
+                item['urls'].append('http://epg.112114.xyz/huya{}'.format(litag.find('a',{'class','title'}, href=True)['href'].replace('https://www.huya.com','')))
                 # if len(data['channels']) > 5:
                 #     continue
                 data['channels'].append(item)
@@ -321,15 +320,15 @@ def live(e):
     fm = urllib.parse.unquote(n['fm'])
     u = base64.b64decode(fm).decode('utf-8')
     p = u.split('_')[0]
-    f = str(int(time.time() * 1e7))
+    f = str(1279522733647 + int(time.time() * 1e3))
     l = n['wsTime']
-    t = '0'
+    t = '1279522733647'
     h = '_'.join([p, t, s, f, l])
     m = hashlib.md5(h.encode('utf-8')).hexdigest()
     y = c[-1]
-    url = "{}?wsSecret={}&wsTime={}&u={}&seqid={}&{}".format(i, m, l, t, f, y)
+    uuid = int((int(time.time() * 1000) % 1e10 * 1e3  + (int(1e3 * random.random()) | 0))  % 4294967295)
+    url = "{}?wsSecret={}&wsTime={}&seqid={}&{}&uid={}&uuid={}".format(i, m, l, f, y,t,uuid)
     return url
-
 
 def get_real_url(room_id):
     try:
