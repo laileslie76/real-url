@@ -8,6 +8,7 @@ import requests,base64,json
 import io
 import sys
 import re
+import random
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer,encoding='utf8')
 
 app = Flask(__name__)
