@@ -348,7 +348,7 @@ def live(e):
     m = hashlib.md5(h.encode('utf-8')).hexdigest()
     y = c[-1]
     uuid = int((int(time.time() * 1000) % 1e10 * 1e3  + (int(1e3 * random.random()) | 0))  % 4294967295)
-    url = "{}?wsSecret={}&wsTime={}&seqid={}&{}&uid={}&uuid={}".format(i, m, l, f, y,t,uuid)
+    url = "{}?wsSecret={}&wsTime={}&seqid={}&{}&u={}&uid={}&uuid={}".format(i, m, l, f, y,t,t,uuid)
     return url
 
 def get_real_url(room_id):
