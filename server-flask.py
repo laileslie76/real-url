@@ -90,14 +90,14 @@ def get_douyu_content_json(group,name):
 
 def get_bili_content_json(parent_area_id,area_id,name):
     data = {'group':name,'channels':[]}
-    url = 'https://api.live.bilibili.com/xlive/web-interface/v1/second/getList?platform=web&parent_area_id={}&area_id={}&sort_type=online&page={}'
+    url = 'https://api.live.bilibili.com/xlive/web-interface/v1/second/getList?platform=web&parent_area_id={}&area_id={}&sort_type=sort_type_123&page={}'
     for id in range(1,5):
         newUrl = url.format(parent_area_id,area_id,id)
         text = requests.get(newUrl).text
         tdata = json.loads(text)
         for d in tdata['data']['list']:
             item = {
-                'name': d['title'],
+                'name': d['uname']+'-'+d['title'],
                 'urls':[]
             }
             item['urls'].append('http://oracle.lppsuixn.tk:8088/bili/{}'.format(d['roomid']))
